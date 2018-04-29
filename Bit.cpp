@@ -17,8 +17,9 @@ Bit::Bit(){
 
 //-------------------------------------------------------
 // setup via existing DNA
-void Bit::setup(DNA _dna){
+void Bit::setup(DNA _dna, int _bitNum){
     // use existing DNA for this bit
+    bitNum = _bitNum;
     dna = _dna;
     geneSize = dna.geneSize;
     numOfGenes = dna.numOfGenes;
@@ -28,8 +29,9 @@ void Bit::setup(DNA _dna){
 
 //-------------------------------------------------------
 // setup via creating DNA 
-void Bit::setup(int _numOfGenes){
+void Bit::setup(int _numOfGenes, int _bitNum){
     // create new DNA for this bit 
+    bitNum = _bitNum;
     numOfGenes = _numOfGenes;
     dna.setup(numOfGenes, geneSize);
     // specific to this bit 
@@ -41,85 +43,81 @@ void Bit::setup(int _numOfGenes){
 // phenotype data scaled to different ranges for visuals
 void Bit::calcPhenotype(){
 
-        branchOffset = ofMap(dna.genes[0],0,1,0,4);
-        startTheta = ofMap(dna.genes[1],0,1, 0, 30);
-        startLength = ofMap(dna.genes[2],0,1, 20, 100);
-        minLength = ofMap(dna.genes[3],0,1, 3, 10);
-        branchReduce = ofMap(dna.genes[4],0,1, 0.45, 0.7);
-        thetaVariance = ofMap(dna.genes[5],0,1, 0, 30);
-        reduceVariance = ofMap(dna.genes[6],0,1, 0, 0.1);
-        startAngle = ofMap(dna.genes[7],0,1, 0, 30);
-        startWidth = ofMap(dna.genes[8],0,1, 2, 20);
-        erosionFactor = ofMap(dna.genes[9],0,1, 0.3, 0.5);
-        leafSize = ofMap(dna.genes[10],0,1,1,6);
-        leafColorR = ofMap(dna.genes[11],0,1,0,255);
-        leafColorG = ofMap(dna.genes[12],0,1,0,255);
-        leafColorB = ofMap(dna.genes[13],0,1,0,255);
-        leafColorA = ofMap(dna.genes[14],0,1,25,100);
-        leafShape = ofMap(dna.genes[15],0,1,3,5);
+    startLength = ofMap(dna.genes[0],0,1, 150, 200);
+    startTheta = ofMap(dna.genes[1],0,1, 0, 40);
+    startWidth = ofMap(dna.genes[2],0,1, 2, 20);
+    minLength = ofMap(dna.genes[3],0,1, 13, 20);
+    branchReduce = ofMap(dna.genes[4],0,1, 0.65, 0.7);
+    thetaVariance = ofMap(dna.genes[5],0,1, 0, 50);
+    reduceVariance = ofMap(dna.genes[6],0,1, 0, 0.1);
+    startAngle = ofMap(dna.genes[7],0,1, 0, 30);
+    erosionFactor = ofMap(dna.genes[8],0,1, 0.3, 0.5);
+    leafSize = ofMap(dna.genes[9],0,1,10,13);
+    leafColorA = 150; 
+    leafColorB = 75; 
 
-        // ?? what is this for
-        seed = ofRandom(1000,65000);
+    // ------------------------------------
+    seed = ofRandom(1000,65000);
 
 }
 
 //-------------------------------------------------------
-void Bit::branch(float b_length, float theta, float b_width){
-    // limit number of branches
-    if(count > 500) cout << "max branches reached" << endl;
+void Bit::branch(float b_length, float theta, float b_width, int depthRemaining){
     
-    // branches
-    if(b_length > minLength ){
-
-        ofSetColor(0);
-        ofSetLineWidth(b_width);
+    // options: nofill for options inside bitspace, but above target
+    if(depthRemaining > 0){
+        
+        // -------------------------------------
+        // current bit
+        // -------------------------------------
+    
+        // current bit's path from 'parent' bit
+        ofSetColor(leafColorB,leafColorA);
         ofDrawLine(0,0,0,-b_length);
-        
-        ofPushMatrix();
-        ofTranslate(0,-b_length);
-        ofRotate(theta + (ofNoise(ofGetFrameNum()/(10*b_length))));
-        branch(b_length * (branchReduce + ofRandom(-reduceVariance, reduceVariance)), theta, b_width * erosionFactor);
-        ofPopMatrix();
-        
-        ofPushMatrix();
-        ofTranslate(0,-b_length * 1.5);
-        ofRotate(-theta - (ofNoise(ofGetFrameNum()/thetaVariance, ofGetFrameNum()/b_length)));
-        branch(b_length * (branchReduce + ofRandom(-reduceVariance, reduceVariance)), theta, b_width * erosionFactor);
-        ofPopMatrix();
 
-    // leaves
-    }else{
-
-        for(int i = 0; i < 20; i++){
-
-            //ofSetColor(leafColorR,leafColorG,leafColorB,leafColorA);
+        // current bit
+        if(depthRemaining != 8 - bitNum){
+        //if(depthRemaining <= 8 - bitNum){
+            ofSetColor(255,75);
+        }else{
             ofSetColor(leafColorB,leafColorA);
-            ofDrawEllipse(ofRandom(-4,4),ofRandom(-4,4),leafSize,leafSize);
         }
-    }
+        ofDrawEllipse(0,-b_length,leafSize-depthRemaining,leafSize);
+
+        bitCount++;
+
+        // -------------------------------------
+        // 'child' bit l
+        // -------------------------------------
+        ofPushMatrix();
+        // branch length
+        ofTranslate(0,-b_length);
+        // branch rotation from parent
+        ofRotate(-theta - (ofNoise(ofGetFrameNum()/thetaVariance*0.5, ofGetFrameNum()/b_length)));
+        // start child branch from itself
+        branch(b_length * (branchReduce + ofRandom(-reduceVariance, reduceVariance)), theta, b_width * erosionFactor, depthRemaining - 1);
+        ofPopMatrix();
     
+        // -------------------------------------
+        // 'child' bit r
+        // -------------------------------------
+        ofPushMatrix();
+        // branch length
+        ofTranslate(0,-b_length);
+        // branch rotation from parent
+        ofRotate(theta + (ofNoise(ofGetFrameNum()/thetaVariance*0.5, ofGetFrameNum()/b_length)));
+        //ofRotate(theta + (ofNoise(ofGetFrameNum()/(10*b_length))));
+        branch(b_length * (branchReduce + ofRandom(-reduceVariance, reduceVariance)), theta, b_width * erosionFactor, depthRemaining - 1);
+        ofPopMatrix();
+    }
 }
 
 //--------------------------------------------------------
 // Draw the bit
 void Bit::draw(int x, int y){
     ofSeedRandom(seed);
-    count = 0;
     ofPushMatrix();
-    ofRotate(ofRandom(-startAngle, startAngle));
-    branch(startLength, startTheta,startWidth);
+    ofRotate(ofRandom(-startAngle/10, startAngle/10));
+    branch(startLength, startTheta,startWidth, 8);
     ofPopMatrix();
 }
-
-////--------------------------------------------------------
-//void Bit::print(){
-//    cout << branchOffset << endl;
-//    cout <<     startTheta << endl;
-//    cout <<     startLength << endl;
-//        cout << minLength << endl;
-//        cout << branchReduce << endl;
-//        cout << thetaVariance << endl;
-//       cout <<  reduceVariance << endl;
-//        cout << startAngle << endl;
-//        cout << seed << endl;
-//}

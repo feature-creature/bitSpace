@@ -6,40 +6,38 @@ class Bit {
 
 	public:
 		Bit();
-		void setup(DNA _dna);
-		void setup(int _numOfGenes);
+		void setup(DNA _dna, int _bitNum);
+		void setup(int _numOfGenes, int _bitNum);
 		void draw();
         void calcPhenotype();
         void draw(int x, int y);
-        float getFitness ();
-        Bit crossover(Bit partner);
-    void branch(float b_length, float theta, float b_width);
-    
+        void branch(float b_length, float theta, float b_width, int depthRemaining);
         void mutate(float mutationRate);
+        float getFitness();
+        Bit crossover(Bit partner);
+    
 
 		DNA dna;
+
 		int numOfGenes, geneSize;
         float fitness;
     
-        float branchOffset;
-        float startTheta;
         float startLength;
+        float startTheta;
+        int startWidth;
         float minLength;
         float branchReduce;
         float thetaVariance;
         float reduceVariance;
         float startAngle;
-        float seed = 0;
-        int count = 0;
-
-        int startWidth;
         float erosionFactor;
         int leafSize;
-        float leafColorR;
-        float leafColorG;
         float leafColorB;
         float leafColorA;
-        int leafShape;
+        float seed = 0;
+        int bitCount = 0;
 
-//    void print();
+        int bitNum;
+
+
 };

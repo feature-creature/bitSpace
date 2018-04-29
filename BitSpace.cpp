@@ -15,13 +15,12 @@ void BitSpace::setup(float m, int num)
     eightBit.clear();
 
     // fill the empty bit vector with temporary bit objects
-    for (int x=0; x<num; x++){
+    for (int i=0; i<num; i++){
         // initialize a bit object 
         Bit tempBit;
         // gene (not DNA) version of setup function
-        tempBit.setup(16);
+        tempBit.setup(10, i);
         // store the new bit in the bit vector
-        // ?? not pointers etc
         eightBit.push_back(tempBit);
     }
 
@@ -68,16 +67,24 @@ void BitSpace::select() {
 // display the current generation of the BitSpace
 // draw each bit
 void BitSpace::draw(){
-    for(int i = eightBit.size() -1; i >= 0; i--)
-    {
-        // bit
-        eightBit[i].draw(0,0);
+    // only draw one of the proper bitspace, not all of them
+    //for(int i = eightBit.size(); i >= 0; i--){
+
+        // draw bit labels across window footing
+        //ofPushMatrix();
+        //ofTranslate((ofGetWidth()/eightBit.size())*i, 0, 0);
+        //ofDrawBitmapString(ofToString(pow(2,i)), -10, 20);
+        //ofPopMatrix();
+
+
+        // draw the selected bit configuration
+        // set up with color tracking
+        ofPushMatrix();
+        ofTranslate(ofGetWidth()/2,-50,0);
+        eightBit[ofRandom(0,8)].draw(0,0);
         ofSetColor(0);
-        // bit's fitness value
-        ofDrawBitmapString(ofToString(pow(2,i)), -10, 20);
-        // to correctly position the next bit in the window, translate 1/num of eightBit distance to the right 
-        ofTranslate(ofGetWidth()/eightBit.size(), 0);
-    }
+        ofPopMatrix();
+    //}
 }
 
 //------------------------------------------------------------
@@ -88,31 +95,31 @@ void BitSpace::generate() {
     for (int i = 0; i < eightBit.size(); i++) {
 
         // (at random) choose two bits from the mating pool
-      int a = int(ofRandom(matingBits.size()));
-      int b = int(ofRandom(matingBits.size()));
+        int a = int(ofRandom(matingBits.size()));
+        int b = int(ofRandom(matingBits.size()));
 
         // store the selected bits as two temporary local bit objects
-      Bit partnerA = matingBits[a];
-      Bit partnerB = matingBits[b];
+        Bit partnerA = matingBits[a];
+        Bit partnerB = matingBits[b];
       
-      // create a temporary local DNA object with the temporary local genotype data
-      DNA childDNA = partnerA.dna.crossover(partnerB.dna);
+        // create a temporary local DNA object with the temporary local genotype data
+        DNA childDNA = partnerA.dna.crossover(partnerB.dna);
 
-      // mutate the child dna for child variability
-      childDNA.mutate(mutationRate);
+        // mutate the child dna for child variability
+        childDNA.mutate(mutationRate);
 
-      // create temporary local bit object 
-      Bit child;
+        // create temporary local bit object 
+        Bit child;
         //set it up with the temporary local DNA data 
-      child.setup(childDNA);
+        child.setup(childDNA, i);
 
-      // replace the currently stored bit
-      // by storing this local temporary bit in its place
-      eightBit[i] = child;
+        // replace the currently stored bit
+        // by storing this local temporary bit in its place
+        eightBit[i] = child;
       
-      // decodes the newly stored bit's geneotype data into
-      // variables for visual phenotype representation
-      eightBit[i].calcPhenotype();
+        // decodes the newly stored bit's geneotype data into
+        // variables for visual phenotype representation
+        eightBit[i].calcPhenotype();
     }
 }
 
