@@ -11,119 +11,121 @@ void BitSpace::setup(float m, int num)
     mutationRate = m;
 
     // prepare for current generation by
-    // empty/clear the bit vector of any previously stored bit objects
-    eightBit.clear();
+    // clearing the byte vector of any previously stored byte objects
+    eightBytes.clear();
 
-    // fill the empty bit vector with temporary bit objects
+    // fill the empty byte vector with byte objects
     for (int i=0; i<num; i++){
-        // initialize a bit object 
-        Bit tempBit;
-        // gene (not DNA) version of setup function
-        tempBit.setup(10, i);
-        // store the new bit in the bit vector
-        eightBit.push_back(tempBit);
+        // initialize local, temporary a byte object 
+        Byte tempByte;
+        // use gene (not DNA) version of setup function, since parent DNA does not exist
+        tempByte.setup(10, i);
+        // store the new byte in the byte vector
+        eightBytes.push_back(tempByte);
+        
+        // for each byte fill bitState vector
+        // !! clean this up
+        bitStates.push_back(false);
     }
 
 }
 
 //-------------------------------------------------------
-// Generate a mating pool
-// designate a sub population of the current population (mating pool)
-// for selecting the possible parents for the next generation of eightBit
+// designate a sub population (mating pool) of the current population 
+// for eventual selection of parents for the next generation of eightBytes
 void BitSpace::select() {
     
-    // empty/clear the mating pool vector of any previously stored bit objects
-    matingBits.clear(); 
+    // clear the mating pool vector of any previously stored byte objects
+    matingBytes.clear(); 
 
-    // clear the previously stored 'total mating quantity' for the entire previous mating pool bit vector 
-    // this value is used to determine the individual bit's probability for mating in relation to the whole pool
+    // clear the 'total mating quantity'
+    // stored for the previous mating pool
+    // this value is used to determine each individual byte's
+    // probability for mating in relation to the whole pool
     float maxFitness=0;
 
-    // sum the total mateability of the current mating pool vector
-    for(int i = 0; i < eightBit.size(); i++) maxFitness += eightBit[i].fitness;
+    // calculate and set the 'total mating quantity' for the current mating pool
+    for(int i = 0; i < eightBytes.size(); i++) maxFitness += eightBytes[i].fitness;
     
-    // create the mating pool of the current population for generating the next generation
-    // first determine % 'mateability' for each current individual in relation to the total current population 
-    // then create mating pool by adding each current individual with a non-zero mateability number to the mating pool
-    // probabilities are created in the mating pool by adding those non-zero individuals to the pool 
-    // multiple times (exactly as many times as their mateability number). 
-    // 2 parents will be chosen from this probabilistic mating pool to generate the next generation of eightBit
-    // higher percent == higher chance for mating -- only 2 get to mate
-    for (int i = 0; i < eightBit.size(); i++) {
+    // create the mating pool from the current population: 
+    // first determine % 'mateability' for each current individual byte 
+    // then populate the mating pool by adding each byte
+    // 'their mateability' number of times to the mating pool  
+    for (int i = 0; i < eightBytes.size(); i++) {
         // normalize fitness values on 0-1 scale
-        float fitnessNormal = ofMap(eightBit[i].fitness, 0, maxFitness, 0, 1);
+        float fitnessNormal = ofMap(eightBytes[i].fitness, 0, maxFitness, 0, 1);
         // normalize fitness values on 0-100 scale
         int n = (int) (fitnessNormal * 100);
         // if the individual has a non-zero n value, add individual n times into mating pool
         for (int j = 0; j < n; j++) {
-            matingBits.push_back(eightBit[i]);
+            matingBytes.push_back(eightBytes[i]);
         }
-
     }
-    // mating pool is now populated for selection
 }
 
 //------------------------------------------------------------
 // display the current generation of the BitSpace
 // draw each bit
 void BitSpace::draw(){
-    // only draw one of the proper bitspace, not all of them
-    //for(int i = eightBit.size(); i >= 0; i--){
 
+    // only draw the byte whose index
+    // equals the index of the most recently flipped bitstate
+    // not the entire byte general population
+    ofPushMatrix();
+    ofTranslate(ofGetWidth()/2,-75,0);
+    // !! link up with flipping
+    eightBytes[3].draw(0,0, bitStates);
+    ofSetColor(0);
+    ofPopMatrix();
+    
+    for(int i = eightBytes.size(); i >= 0; i--){
         // draw bit labels across window footing
-        //ofPushMatrix();
-        //ofTranslate((ofGetWidth()/eightBit.size())*i, 0, 0);
-        //ofDrawBitmapString(ofToString(pow(2,i)), -10, 20);
-        //ofPopMatrix();
-
-
-        // draw the selected bit configuration
-        // set up with color tracking
         ofPushMatrix();
-        ofTranslate(ofGetWidth()/2,-50,0);
-        eightBit[ofRandom(0,8)].draw(0,0);
-        ofSetColor(0);
+        ofTranslate((ofGetWidth()/eightBytes.size())*i, 0, 0);
+        ofDrawBitmapString(ofToString(pow(2,i)), -10, 20);
         ofPopMatrix();
-    //}
+    }
 }
 
 //------------------------------------------------------------
-// Create a new generation of eightBit and
-// fill the bit vector with them 
+// Create a new generation of eightBytes
 void BitSpace::generate() {
 
-    for (int i = 0; i < eightBit.size(); i++) {
+    // for the entire general population in the bitspace
+    for (int i = 0; i < eightBytes.size(); i++) {
 
-        // (at random) choose two bits from the mating pool
-        int a = int(ofRandom(matingBits.size()));
-        int b = int(ofRandom(matingBits.size()));
+        // (at random) choose two parent bytes from the mating pool
+        // for generating the next generation
+        int a = int(ofRandom(matingBytes.size()));
+        int b = int(ofRandom(matingBytes.size()));
 
-        // store the selected bits as two temporary local bit objects
-        Bit partnerA = matingBits[a];
-        Bit partnerB = matingBits[b];
+        // store the selected bytes as two temporary local byte objects
+        Byte partnerA = matingBytes[a];
+        Byte partnerB = matingBytes[b];
       
-        // create a temporary local DNA object with the temporary local genotype data
+        // create a temporary local dna object for the eventual child byte
+        // using the parent's temporary local genotype data
         DNA childDNA = partnerA.dna.crossover(partnerB.dna);
 
-        // mutate the child dna for child variability
+        // mutate the local, temporary child dna for child variability
         childDNA.mutate(mutationRate);
 
-        // create temporary local bit object 
-        Bit child;
-        //set it up with the temporary local DNA data 
+        // create temporary local byte object 
+        Byte child;
+        //set up with the temporary local child DNA
         child.setup(childDNA, i);
 
-        // replace the currently stored bit
-        // by storing this local temporary bit in its place
-        eightBit[i] = child;
+        // replace the current generation's stored byte
+        // with a byte for the new generation
+        eightBytes[i] = child;
       
-        // decodes the newly stored bit's geneotype data into
-        // variables for visual phenotype representation
-        eightBit[i].calcPhenotype();
+        // decode the newly stored byte's geneotype data 
+        // for shaping visual phenotype representation
+        eightBytes[i].calcPhenotype();
     }
 }
 
 //------------------------------------------------------------
 void BitSpace::flip(int n){
-     eightBit[n].fitness++;
+     eightBytes[n].fitness++;
 }

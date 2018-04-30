@@ -10,9 +10,9 @@ class DNA{
         DNA crossover(DNA partner);
         void mutate(float mutationRate);
 
-		vector<float> genes;
 		int numOfGenes;
 		int geneSize;
+		vector<float> genes;
         float fitness;
         float mutationAmount;
 };

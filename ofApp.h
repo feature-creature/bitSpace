@@ -5,6 +5,7 @@
 class ofApp : public ofBaseApp{
 
 	public:
+        // methods
 		void setup();
 		void update();
 		void draw();
@@ -12,23 +13,20 @@ class ofApp : public ofBaseApp{
         void mousePressed(int x, int y, int button);
         
         // bitspace
-        void displayInfo();
-        int popmax;
         float mutationRate;
+        int popmax;
         BitSpace bitSpace;
-        bool activate;
 
-        // bit tracker
-        ofVideoGrabber vidGrabber;
+        // color tracking 
+        vector<ofColor> targetColors;
+        vector<float> targetThresholds;
+        int target;
         int count;
         int sumCloseColorsX, sumCloseColorsY;
         int closestColorX, closestColorY;
-        float rTarget;
-        float gTarget;
-        float bTarget;
-        float threshold;
+        
+        // video feed
+        ofVideoGrabber vidGrabber;
         bool sourceVisible = true;
-
-
 
 };
