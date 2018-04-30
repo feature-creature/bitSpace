@@ -59,16 +59,12 @@ void Byte::branch(float b_length, float theta, float b_width, int depthRemaining
 
         ofSetColor(leafColorB,leafColorA);
 
-        // !! this is where to aesthetic
         // current bit's path from previous bit
         ofDrawLine(0,0,0,-b_length);
 
         // if bitstate is off - color white, otherwise color gray
-        if(_bitStates[8-depthRemaining] == false) ofSetColor(255,75);
+        if(_bitStates[8-depthRemaining] == true) ofSetColor(255,75);
 
-        // !! this is where to aesthetic
-        // current bit's path from previous bit
-        //ofDrawLine(0,0,0,-b_length);
 
         // bit
         ofDrawEllipse(0,-b_length,leafSize-depthRemaining,leafSize);

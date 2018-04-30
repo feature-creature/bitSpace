@@ -22,7 +22,7 @@ void ofApp::setup(){
     // initialize target thresholds for target colors
     targetThresholds.clear();
     for(int i = 0; i < popmax; i++){
-        targetThresholds.push_back(2);
+        targetThresholds.push_back(1);
     }
 
     // initialize target
@@ -32,7 +32,6 @@ void ofApp::setup(){
     vidGrabber.setDeviceID(0);
     vidGrabber.setDesiredFrameRate(30);
     vidGrabber.initGrabber(640,460);
-
 }
 
 //--------------------------------------------------------------
@@ -106,7 +105,7 @@ void ofApp::update(){
                 if(bitSpace.bitStates[i] != true){
                     bitSpace.bitStates[i] = true;
                     // !! update 0
-                    bitSpace.flip(0);
+                    bitSpace.flip(i);
                     bitSpace.select();
                     bitSpace.generate();
                 }
@@ -117,7 +116,7 @@ void ofApp::update(){
                 if(bitSpace.bitStates[i]!= false){
                     bitSpace.bitStates[i] = false;
                     // !! update 0
-                    bitSpace.flip(0);
+                    bitSpace.flip(i);
                     bitSpace.select();
                     bitSpace.generate();
                 }
@@ -154,8 +153,8 @@ void ofApp::draw(){
     // show bitSpace
     ofPushMatrix();
     ofPushStyle();
-    ofTranslate(300, ofGetHeight()-30, 0);
-    bitSpace.draw();
+    ofTranslate(0, ofGetHeight()-30, 0);
+    bitSpace.draw(flipper);
     ofPopStyle();
     ofPopMatrix();
 

@@ -10,7 +10,7 @@ class BitSpace{
     void flip(int n);
     void select();
     void generate();
-    void draw();
+    void draw(int _bitFlip);
 
     float mutationRate;
     

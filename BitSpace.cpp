@@ -66,25 +66,59 @@ void BitSpace::select() {
 //------------------------------------------------------------
 // display the current generation of the BitSpace
 // draw each bit
-void BitSpace::draw(){
+void BitSpace::draw(int _bitFlip){
 
-    // only draw the byte whose index
-    // equals the index of the most recently flipped bitstate
-    // not the entire byte general population
+    // only draws the byte whose index
+    // equals the index of the most recently flipped bit
+    // does not draw the entire byte population
     ofPushMatrix();
-    ofTranslate(ofGetWidth()/2,-75,0);
-    // !! link up with flipping
-    eightBytes[3].draw(0,0, bitStates);
+    ofTranslate(ofGetWidth()/2, -100,0);
+    eightBytes[_bitFlip].draw(0,0, bitStates);
     ofSetColor(0);
     ofPopMatrix();
-    
-    for(int i = eightBytes.size(); i >= 0; i--){
+    int total = 0;
+
+    // draw bit labels for the byte
+    for(int i = 0; i < eightBytes.size(); i++){
         // draw bit labels across window footing
         ofPushMatrix();
-        ofTranslate((ofGetWidth()/eightBytes.size())*i, 0, 0);
-        ofDrawBitmapString(ofToString(pow(2,i)), -10, 20);
+        ofTranslate((ofGetWidth()/(eightBytes.size()+2))*(8.5 - i), 0, 0);
+
+        ofSetColor(25,100);
+        ofDrawEllipse(0,-10,15,15);
+
+        if(bitStates[i]){
+            ofSetColor(255,100);
+            total += pow(2,i);
+        }
+
+        ofDrawEllipse(0,-10,12,12);
+        ofSetRectMode(OF_RECTMODE_CENTER);  
+
+        int offset = 0;
+        if(pow(2,i) > 10) offset = 5;
+        if(pow(2,i) > 100) offset = 10;
+
+        if(bitStates[i]){
+            ofSetColor(255,100);
+            ofDrawBitmapString(ofToString(pow(2,i)), -3 - offset, -25);
+        }else{
+            ofSetColor(25,100);
+            ofDrawBitmapString(ofToString(pow(2,i)), -3 - offset, 15);
+        }
         ofPopMatrix();
     }
+
+    // draw byte total
+    ofPushMatrix();
+    int totalOffset = 3;
+    if(total > 10) totalOffset = 8;
+    if(total > 100) totalOffset = 13;
+    ofTranslate(ofGetWidth()/2 - totalOffset, -80,0);
+    ofSetColor(255,100);
+    ofDrawBitmapString(total,0,0);
+    ofPopMatrix();
+
 }
 
 //------------------------------------------------------------

@@ -16,6 +16,7 @@ class ofApp : public ofBaseApp{
         float mutationRate;
         int popmax;
         BitSpace bitSpace;
+        int flipper;
 
         // color tracking 
         vector<ofColor> targetColors;
