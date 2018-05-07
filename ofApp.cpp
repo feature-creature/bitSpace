@@ -136,7 +136,7 @@ void ofApp::draw(){
         // show video feed
         vidGrabber.draw(0,0);
         // show color information of current color tracking target
-        ofDrawBitmapString("color: ", 25, 25);
+        ofDrawBitmapString("bit: ", 25, 25);
         // target color's bit index and state
         ofDrawBitmapString(target, 75, 25);
         ofDrawBitmapString(bitSpace.bitStates[target], 25, 50);
