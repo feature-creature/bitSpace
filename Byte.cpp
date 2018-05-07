@@ -60,19 +60,21 @@ void Byte::branch(float b_length, float theta, float b_width, int depthRemaining
         ofSetColor(leafColorB,leafColorA);
 
         // current bit's path from previous bit
-        ofDrawLine(0,0,0,-b_length);
+        if(depthRemaining != 8) ofDrawLine(0,0,0,-b_length);
 
         // if bitstate is off - color white, otherwise color gray
-        if(_bitStates[8-depthRemaining] == true) ofSetColor(255,75);
+        if(_bitStates[8-depthRemaining] == true) ofSetColor(255,150);
 
 
         // bit
-        ofDrawEllipse(0,-b_length,leafSize-depthRemaining,leafSize);
+        ofDrawEllipse(0,-b_length,leafSize+depthRemaining,leafSize+depthRemaining);
 
 
         // 'child' bit 0
         ofPushMatrix();
         ofTranslate(0,-b_length);
+        ofRotate(-theta - (ofNoise(ofGetFrameNum()/(10*b_length))));
+        ofRotate(-theta - (ofNoise(ofGetFrameNum()/thetaVariance*0.5, ofGetFrameNum()/b_length)));
         ofRotate(-theta - (ofNoise(ofGetFrameNum()/thetaVariance*0.5, ofGetFrameNum()/b_length)));
         branch(b_length * (branchReduce + ofRandom(-reduceVariance, reduceVariance)), theta, b_width * erosionFactor, depthRemaining - 1, _bitStates);
         ofPopMatrix();
@@ -80,8 +82,9 @@ void Byte::branch(float b_length, float theta, float b_width, int depthRemaining
         // 'child' bit 1
         ofPushMatrix();
         ofTranslate(0,-b_length);
-        ofRotate(theta + (ofNoise(ofGetFrameNum()/thetaVariance*0.5, ofGetFrameNum()/b_length)));
-        //ofRotate(theta + (ofNoise(ofGetFrameNum()/(10*b_length))));
+        ofRotate(theta + (ofNoise(ofGetFrameNum()/(20*b_length))));
+        ofRotate(theta + (ofNoise(ofGetFrameNum()/thetaVariance, ofGetFrameNum()/b_length)));
+        ofRotate(theta + (ofNoise(ofGetFrameNum()/(10*b_length))));
         branch(b_length * (branchReduce + ofRandom(-reduceVariance, reduceVariance)), theta, b_width * erosionFactor, depthRemaining - 1, _bitStates);
         ofPopMatrix();
     }
@@ -93,7 +96,6 @@ void Byte::draw(int x, int y, vector<bool> _bitStates){
     ofSeedRandom(seed);
     ofPushMatrix();
     ofRotate(ofRandom(-startAngle/10, startAngle/10));
-    // !! pass popmax
     branch(startLength, startTheta,startWidth, 8, _bitStates);
     ofPopMatrix();
 }

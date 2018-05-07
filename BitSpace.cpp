@@ -72,7 +72,7 @@ void BitSpace::draw(int _bitFlip){
     // equals the index of the most recently flipped bit
     // does not draw the entire byte population
     ofPushMatrix();
-    ofTranslate(ofGetWidth()/2, -100,0);
+    ofTranslate(ofGetWidth()/2, -200,0);
     eightBytes[_bitFlip].draw(0,0, bitStates);
     ofSetColor(0);
     ofPopMatrix();
@@ -82,13 +82,13 @@ void BitSpace::draw(int _bitFlip){
     for(int i = 0; i < eightBytes.size(); i++){
         // draw bit labels across window footing
         ofPushMatrix();
-        ofTranslate((ofGetWidth()/(eightBytes.size()+2))*(8.5 - i), 0, 0);
+        ofTranslate((ofGetWidth()/(eightBytes.size()+2))*(8.5 - i), -50, 0);
 
         ofSetColor(25,100);
         ofDrawEllipse(0,-10,15,15);
 
         if(bitStates[i]){
-            ofSetColor(255,100);
+            ofSetColor(255,150);
             total += pow(2,i);
         }
 
@@ -114,7 +114,7 @@ void BitSpace::draw(int _bitFlip){
     int totalOffset = 3;
     if(total > 10) totalOffset = 8;
     if(total > 100) totalOffset = 13;
-    ofTranslate(ofGetWidth()/2 - totalOffset, -80,0);
+    ofTranslate(ofGetWidth()/2 - totalOffset, -120,0);
     ofSetColor(255,100);
     ofDrawBitmapString(total,0,0);
     ofPopMatrix();
