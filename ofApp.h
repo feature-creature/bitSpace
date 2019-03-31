@@ -10,7 +10,7 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
 		void keyPressed(int key);
-        void mousePressed(int x, int y, int button);
+        void flip(int bit);
         
         // bitspace
         float mutationRate;
